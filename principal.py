@@ -4,6 +4,7 @@ import psycopg2
 from configuration import *
 import webscraping_computrabajo
 import webscraping_indeed
+import webscraping_buscojobs
 from controller import Controller
 from dbconnection import Connection
 
@@ -51,6 +52,15 @@ def set_url_busqueda_compuTrabajo(carga):
     paginado = "&p="
     carga["url_prefix"] = carga["url_principal"] + urlbusqueda + paginado
     carga["url_sufix"] = ""
+    carga["url_busqueda"] = carga["url_principal"] + urlbusqueda
+
+def set_url_busqueda_buscojobs(carga):
+    #MODIFICADO URL BUSCOJOBS
+    carga["url_principal"] = BUSCOJOBS["WS_PORTAL_LABORAL_URL"]
+    urlbusqueda = "/ofertas/tc25/trabajo-de-tecnologias-de-la-informacion"
+    paginado = "/"
+    carga["url_prefix"] = carga["url_principal"] + urlbusqueda + paginado
+    carga["url_sufix"] = ""
     carga["url_busqueda"] = carga["url_principal"] + urlbusqueda    
 
 def connect_bd():
@@ -73,7 +83,7 @@ def delati_compuTrabajo():
     listaOferta = webscraping_computrabajo.scraping_ofertas(con, carga["url_principal"], carga["url_prefix"], carga["url_sufix"],
                                                carga["pagina_inicial"], carga["cant_paginas"], carga["cant_ofertas"],
                                                carga["id_carga"])
-    print(listaOferta)
+    #print(listaOferta)
 
 def delati_indeed():
     controller = Controller()
@@ -93,7 +103,26 @@ def delati_indeed():
                                                carga["id_carga"])
     print(listaOferta)
 
-if __name__ == "__main__":
-    delati_compuTrabajo()
-    delati_indeed()
 
+def delati_buscojobs():
+    controller = Controller()
+    con = connect_bd()
+    carga = {}
+    carga["pagina"] = BUSCOJOBS["WS_PORTAL_LABORAL"]
+    carga["cant_paginas"] = BUSCOJOBS["WS_PAGINAS"]
+    carga["pagina_inicial"] = BUSCOJOBS["WS_PAGINA_INICIAL"]
+    carga["cant_ofertas"] = BUSCOJOBS["WS_OFERTAS"]
+    carga["busqueda_area"] = BUSCOJOBS["WS_AREA"]
+    carga["busqueda"] = ""
+    set_url_busqueda_buscojobs(carga)
+    carga["id_carga"] = controller.registrar_webscraping(con, carga)
+    listaOferta = webscraping_buscojobs.scraping_ofertas(con, carga["url_principal"], carga["url_prefix"], carga["url_sufix"],
+                                               carga["pagina_inicial"], carga["cant_paginas"], carga["cant_ofertas"],
+                                               carga["id_carga"])
+    #print(listaOferta)
+
+
+if __name__ == "__main__":
+    #delati_compuTrabajo()
+    #delati_indeed()
+    delati_buscojobs()

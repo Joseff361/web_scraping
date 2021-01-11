@@ -16,7 +16,8 @@ class Controller:
         return id
 
     def registrar_oferta(self, con, oferta):        
-            idResult = self.dboferta.insert_oferta(con, oferta)            
+        idResult = self.dboferta.insert_oferta(con, oferta)            
+        return idResult
 
     def registrar_ofertas(self, con, lista_oferta):
         print(len(lista_oferta))
@@ -39,3 +40,7 @@ class Controller:
             descripcion_normalizada = " ".join(new_words)
             element["descripcion_normalizada"] = descripcion_normalizada
         # DBOfertadetalle.update_requisito(con, element)
+
+    def registrar_oferta_detalle(self, con, oferta_detalle):
+        idResult = self.dbofertadetalle.insertOfertaDetalle(con, oferta_detalle)    
+
