@@ -3,6 +3,7 @@ from nltk import word_tokenize
 from dboperation import DBWebscraping
 from dboperation import DBOferta
 from dboperation import DBOfertadetalle
+from dboperation import DBKeyworSearch
 
 
 class Controller:
@@ -10,6 +11,7 @@ class Controller:
         self.dbwebscraping = DBWebscraping()
         self.dboferta = DBOferta()
         self.dbofertadetalle = DBOfertadetalle()
+        self.dbkeywordsearch = DBKeyworSearch()
 
     def registrar_webscraping(self, con, webscraping):
         id = self.dbwebscraping.insert_webscraping(con, webscraping)
@@ -44,3 +46,5 @@ class Controller:
     def registrar_oferta_detalle(self, con, oferta_detalle):
         idResult = self.dbofertadetalle.insertOfertaDetalle(con, oferta_detalle)    
 
+    def obtener_keyword_search(self, con):  
+        return self.dbkeywordsearch.obtener_descripcion(con)

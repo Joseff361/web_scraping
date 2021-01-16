@@ -10,8 +10,8 @@ class DBWebscraping:
           mydb = connection.connect()         
           cur = mydb.cursor() 
           # insertando un registro
-          sql = "insert into webscraping (busqueda, busqueda_area, pagina_web, url_pagina, url_busqueda,fecha_creacion,fecha_modificacion) values (%s,%s,%s,%s,%s,current_date,current_date)"
-          params = (carga["busqueda"], carga["busqueda_area"], carga["pagina"], carga["url_principal"],carga["url_busqueda"])
+          sql = "insert into webscraping (busqueda, busqueda_area, pagina_web, url_pagina, url_busqueda,fecha_creacion,fecha_modificacion, id_keyword) values (%s,%s,%s,%s,%s,current_date,current_date,%s)"
+          params = (carga["busqueda"], carga["busqueda_area"], carga["pagina"], carga["url_principal"],carga["url_busqueda"], carga["id_keyword"])
                     
           cur.execute(sql, params)                 
 
@@ -92,3 +92,33 @@ class DBOfertadetalle:
             mydb.close()
         
         return 1
+
+
+class DBKeyworSearch:
+    def __init__(self):
+        pass
+
+    def obtener_descripcion(self, connection):        
+        try:
+            mydb = connection.connect()
+            cur = mydb.cursor()                                    
+
+            sql = "SELECT DESCRIPCION, ID_TIPOKEYWORD FROM KEYWORD_SEARCH"
+            cur.execute(sql)  
+            
+            array_de_tuplas = []
+            row = cur.fetchone()
+            while row is not None:
+                array_de_tuplas.append(row)
+                row = cur.fetchone()
+
+            # close the communication with the PostgreSQL
+            cur.close()
+            mydb.close()                           
+
+        except (Exception, psycopg2.DatabaseError) as error:                
+                print ("-------------Exception, psycopg2.DatabaseError-------------------")
+                print (error)
+                mydb.close()        
+            
+        return array_de_tuplas

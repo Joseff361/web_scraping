@@ -30,6 +30,8 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
     i=1
     m=0  
 
+    obtener_lista_keywords(con)
+
     #for i in range(pagina_inicial, cant_paginas):
     for i in range(BUSCOJOBS["WS_PAGINA_INICIAL"], BUSCOJOBS["WS_PAGINAS"]+1):
         #print(prefix_url)
@@ -85,7 +87,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                 oferta["detalle"] = ""
             lista_oferta.append(oferta)  
             row_id = controller.registrar_oferta(con, oferta)
-            scraping_ofertadetalle(link, row_id, con)
+            #scraping_ofertadetalle(link, row_id, con)
 
     return lista_oferta
 
@@ -131,3 +133,20 @@ def replace_quote(list):
         el = el.replace("'", "''")
         new_list.append(el)
     return new_list
+
+
+def obtener_lista_keywords(con):
+    controller = Controller()
+    lista_busquedas = []
+    i = 1
+    for search in controller.obtener_keyword_search(con): 
+        busqueda = {}
+        if search != None:
+            busqueda["descripcion"] = '/search/' + search[0].replace(" ", "-").replace(".", "")
+            busqueda["id"] = i
+            lista_busquedas.append(busqueda)
+            i += 1
+
+    return lista_busquedas
+
+

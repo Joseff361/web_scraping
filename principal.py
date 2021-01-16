@@ -57,11 +57,11 @@ def set_url_busqueda_compuTrabajo(carga):
 def set_url_busqueda_buscojobs(carga):
     #MODIFICADO URL BUSCOJOBS
     carga["url_principal"] = BUSCOJOBS["WS_PORTAL_LABORAL_URL"]
-    urlbusqueda = "/ofertas/tc25/trabajo-de-tecnologias-de-la-informacion"
-    paginado = "/"
-    carga["url_prefix"] = carga["url_principal"] + urlbusqueda + paginado
+    #urlbusqueda = "/ofertas/tc25/trabajo-de-tecnologias-de-la-informacion"
+    carga["paginado"] = "/"
+    #carga["url_prefix"] = carga["url_principal"] + urlbusqueda + paginado
     carga["url_sufix"] = ""
-    carga["url_busqueda"] = carga["url_principal"] + urlbusqueda    
+    #carga["url_busqueda"] = carga["url_principal"] + urlbusqueda    
 
 def connect_bd():
     con = Connection(DATABASE["DB_HOST"], DATABASE["DB_SERVICE"], DATABASE["DB_USER"], DATABASE["DB_PASSWORD"])
@@ -79,6 +79,7 @@ def delati_compuTrabajo():
     carga["busqueda_area"] = COMPUTRABAJO["WS_AREA"]
     carga["busqueda"] = ""
     set_url_busqueda_compuTrabajo(carga)
+
     carga["id_carga"] = controller.registrar_webscraping(con, carga)
     listaOferta = webscraping_computrabajo.scraping_ofertas(con, carga["url_principal"], carga["url_prefix"], carga["url_sufix"],
                                                carga["pagina_inicial"], carga["cant_paginas"], carga["cant_ofertas"],
@@ -115,8 +116,15 @@ def delati_buscojobs():
     carga["busqueda_area"] = BUSCOJOBS["WS_AREA"]
     carga["busqueda"] = ""
     set_url_busqueda_buscojobs(carga)
-    carga["id_carga"] = controller.registrar_webscraping(con, carga)
-    listaOferta = webscraping_buscojobs.scraping_ofertas(con, carga["url_principal"], carga["url_prefix"], carga["url_sufix"],
+
+    for type_search in webscraping_buscojobs.obtener_lista_keywords(con):
+        carga["url_prefix"] = carga["url_principal"] + type_search['descripcion'] + carga["paginado"]
+        carga["url_busqueda"] = carga["url_principal"] + type_search['descripcion']
+
+        carga["id_keyword"] = type_search['id']
+        carga["id_carga"] = controller.registrar_webscraping(con, carga)
+
+        listaOferta = webscraping_buscojobs.scraping_ofertas(con, carga["url_principal"], carga["url_prefix"], carga["url_sufix"],
                                                carga["pagina_inicial"], carga["cant_paginas"], carga["cant_ofertas"],
                                                carga["id_carga"])
     #print(listaOferta)
