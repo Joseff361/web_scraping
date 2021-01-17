@@ -58,7 +58,6 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             # Almacena la url de la oferta
             oferta["url"] = link
            
-            oferta["salario"] = ""
 
             oferta["puesto"] = el.find("h3", {"class": ""}).get_text().strip()[0:200]
             try:
@@ -73,12 +72,16 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             oferta_d=soup_deta.find("div", attrs={"class":"oferta-main-top"})                    
             oferta["empresa"] = oferta_d.find("h2", attrs={"class":""}).get_text().strip()
             
-            
-            #area = filtro_lugar[-1].get_text().strip()
-            #if area!=None:                                            
-            #    oferta["area"]=area
-            #else:
-            #    oferta["area"]=''
+            oferta["salario"] = ""
+
+            try:
+                paga = soup_deta.findAll("div", attrs={"class": "row oferta-contenido"})
+                str3 = paga[0].get_text().splitlines()
+                str3 = list(filter(None, str3))
+                if(str3[2][0] == 'S'):
+                    oferta["salario"] = str3[2].split(":")[-1].strip()
+            except:
+                print("except")
             
             aviso_deta = soup_deta.find("div", attrs={"class":"col-md-12 descripcion-texto"})
             if aviso_deta!=None:                                            
@@ -87,7 +90,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                 oferta["detalle"] = ""
             lista_oferta.append(oferta)  
             row_id = controller.registrar_oferta(con, oferta)
-            scraping_ofertadetalle(link, row_id, con)
+            #scraping_ofertadetalle(link, row_id, con)
 
     return lista_oferta
 
