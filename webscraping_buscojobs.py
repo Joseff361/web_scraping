@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from urllib.request import urlopen
 from urllib.error import HTTPError
 import bs4
@@ -5,7 +6,6 @@ from bs4 import BeautifulSoup
 import requests
 from controller import Controller
 from configuration import BUSCOJOBS
-
 
 def contain_br(contents):
     for element in contents:
@@ -87,7 +87,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                 oferta["detalle"] = ""
             lista_oferta.append(oferta)  
             row_id = controller.registrar_oferta(con, oferta)
-            #scraping_ofertadetalle(link, row_id, con)
+            scraping_ofertadetalle(link, row_id, con)
 
     return lista_oferta
 
