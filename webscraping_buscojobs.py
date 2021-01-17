@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 import requests
 from controller import Controller
 from configuration import BUSCOJOBS
+import unicodedata
+
 
 def contain_br(contents):
     for element in contents:
@@ -57,20 +59,21 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             oferta["url_pagina"] = url_pagina
             # Almacena la url de la oferta
             oferta["url"] = link
-           
+                
 
-            oferta["puesto"] = el.find("h3", {"class": ""}).get_text().strip()[0:200]
+            oferta["puesto"] = elimina_tildes(el.find("h3", {"class": ""}).get_text().strip()[0:200])
+
             try:
-                oferta["lugar"] = el.find("span", attrs={"class": ""}).get_text().strip().split("-")[1].strip()
+                oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[1].strip())
             except:
-                oferta["lugar"] = el.find("span", attrs={"class": ""}).get_text().strip().split("-")[0].strip()
+                oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[0].strip())
             
             # Accede al contenido HTML del detalle de la oferta
             reqDeta = requests.get(oferta["url"])            
             soup_deta = BeautifulSoup(reqDeta.text, "lxml")
 
             oferta_d=soup_deta.find("div", attrs={"class":"oferta-main-top"})                    
-            oferta["empresa"] = oferta_d.find("h2", attrs={"class":""}).get_text().strip()
+            oferta["empresa"] = elimina_tildes(oferta_d.find("h2", attrs={"class":""}).get_text().strip())
             
             oferta["salario"] = ""
 
@@ -79,18 +82,18 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                 str3 = paga[0].get_text().splitlines()
                 str3 = list(filter(None, str3))
                 if(str3[2][0] == 'S'):
-                    oferta["salario"] = str3[2].split(":")[-1].strip()
+                    oferta["salario"] = elimina_tildes(str3[2].split(":")[-1].strip())
             except:
                 print("except")
             
             aviso_deta = soup_deta.find("div", attrs={"class":"col-md-12 descripcion-texto"})
             if aviso_deta!=None:                                            
-                oferta["detalle"]=aviso_deta.get_text().strip()[0:800]
+                oferta["detalle"]=elimina_tildes(aviso_deta.get_text().strip()[0:800])
             else:
                 oferta["detalle"] = ""
             lista_oferta.append(oferta)  
             row_id = controller.registrar_oferta(con, oferta)
-            #scraping_ofertadetalle(link, row_id, con)
+            scraping_ofertadetalle(link, row_id, con)
 
     return lista_oferta
 
@@ -104,14 +107,14 @@ def scraping_ofertadetalle(url_pagina, row_id, con):
     soup = BeautifulSoup(req.text, "lxml")
     
     contenido = soup.find("div", attrs={"class": "col-md-12 descripcion-texto"})
-    str_list = contenido.decode_contents().replace("</p>", '').replace("<p>", '').replace("-", '').strip().split('<br/>')
+    str_list = elimina_tildes(contenido.decode_contents().replace("</p>", '').replace("<p>", '').replace("-", '').replace("•", '').strip()).split('<BR/>')
 
     str_list = list(filter(None, str_list))
 
     print(str_list)
     try:
         contenido_extra = soup.findAll("div", attrs={"class": "row oferta-contenido"})
-        str_list2 = contenido_extra[-1].get_text().splitlines()
+        str_list2 = elimina_tildes(contenido_extra[-1].get_text().replace("•", '')).splitlines()
         str_list2 = list(filter(None, str_list2))
     except:
         str_list2 = []
@@ -153,3 +156,6 @@ def obtener_lista_keywords(con):
     return lista_busquedas
 
 
+def elimina_tildes(cadena):
+    s = ''.join((c for c in unicodedata.normalize('NFD',cadena) if unicodedata.category(c) != 'Mn'))
+    return s.upper()
