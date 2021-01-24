@@ -111,7 +111,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                     oferta["detalle"] = ""
                 lista_oferta.append(oferta)  
                 row_id = controller.registrar_oferta(con, oferta)
-                #scraping_ofertadetalle(link, row_id, con)
+                scraping_ofertadetalle(link, row_id, con)
             else:
                 print("Registro redundante")
 
