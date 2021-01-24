@@ -59,41 +59,54 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             oferta["url_pagina"] = url_pagina
             # Almacena la url de la oferta
             oferta["url"] = link
+            #print(oferta["url"].split("-")[-1])
+
+            redundancia  = controller.evitar_redundancia(con, oferta)
+            redundancia = None
+            if(redundancia is None):
+                print("Registro nuevo")
+
+                oferta["time_publicacion"] = elimina_tildes(el.find("span", attrs={"class": "pull-right"}).get_text().strip())
+                #print(oferta["time_publicacion"])
+            
+                oferta["puesto"] = elimina_tildes(el.find("h3", {"class": ""}).get_text().strip()[0:200])
+
+                try:
+                    oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[1].strip())
+                except:
+                    oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[0].strip())
                 
+                # Accede al contenido HTML del detalle de la oferta
+                reqDeta = requests.get(oferta["url"])            
+                soup_deta = BeautifulSoup(reqDeta.text, "lxml")
 
-            oferta["puesto"] = elimina_tildes(el.find("h3", {"class": ""}).get_text().strip()[0:200])
+                oferta_d=soup_deta.find("div", attrs={"class":"oferta-main-top"})                    
+                oferta["empresa"] = elimina_tildes(oferta_d.find("h2", attrs={"class":""}).get_text().strip())
+                
+                oferta["salario"] = "NO ESPECIFICADO"
 
-            try:
-                oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[1].strip())
-            except:
-                oferta["lugar"] = elimina_tildes(el.find("span", attrs={"class": ""}).get_text().strip().split("-")[0].strip())
-            
-            # Accede al contenido HTML del detalle de la oferta
-            reqDeta = requests.get(oferta["url"])            
-            soup_deta = BeautifulSoup(reqDeta.text, "lxml")
+                oferta["area"]=elimina_tildes(oferta_d.findAll("a", attrs={"class": ""})[-1].get_text().strip())
+                oferta["id_anuncioempleo"] = link.split('-')[-1]
 
-            oferta_d=soup_deta.find("div", attrs={"class":"oferta-main-top"})                    
-            oferta["empresa"] = elimina_tildes(oferta_d.find("h2", attrs={"class":""}).get_text().strip())
-            
-            oferta["salario"] = ""
-
-            try:
-                paga = soup_deta.findAll("div", attrs={"class": "row oferta-contenido"})
-                str3 = paga[0].get_text().splitlines()
-                str3 = list(filter(None, str3))
-                if(str3[2][0] == 'S'):
-                    oferta["salario"] = elimina_tildes(str3[2].split(":")[-1].strip())
-            except:
-                print("except")
-            
-            aviso_deta = soup_deta.find("div", attrs={"class":"col-md-12 descripcion-texto"})
-            if aviso_deta!=None:                                            
-                oferta["detalle"]=elimina_tildes(aviso_deta.get_text().strip()[0:800])
+                try:
+                    paga = soup_deta.findAll("div", attrs={"class": "row oferta-contenido"})
+                    str3 = paga[0].get_text().splitlines()
+                    str3 = list(filter(None, str3))
+                    if(str3[2][0] == 'S'):
+                        oferta["salario"] = elimina_tildes(str3[2].split(":")[-1].strip())
+                except:
+                    print("except")
+                
+                aviso_deta = soup_deta.find("div", attrs={"class":"col-md-12 descripcion-texto"})
+                if aviso_deta!=None:                                            
+                    oferta["detalle"]=elimina_tildes(aviso_deta.get_text().strip()[0:800])
+                else:
+                    oferta["detalle"] = ""
+                lista_oferta.append(oferta)  
+                row_id = controller.registrar_oferta(con, oferta)
+                #scraping_ofertadetalle(link, row_id, con)
             else:
-                oferta["detalle"] = ""
-            lista_oferta.append(oferta)  
-            row_id = controller.registrar_oferta(con, oferta)
-            scraping_ofertadetalle(link, row_id, con)
+                print("Registro redundante")
 
     return lista_oferta
 

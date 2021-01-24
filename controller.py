@@ -48,3 +48,6 @@ class Controller:
 
     def obtener_keyword_search(self, con):  
         return self.dbkeywordsearch.obtener_descripcion(con)
+
+    def evitar_redundancia(self, con, oferta):
+        return self.dboferta.evitar_redundancia(con, oferta)
