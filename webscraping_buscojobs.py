@@ -65,7 +65,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             #print(oferta["url"].split("-")[-1])
 
             redundancia  = controller.evitar_redundancia(con, oferta)
-            redundancia = None
+            #redundancia = None
             if(redundancia is None):
                 print("Registro nuevo")
 
