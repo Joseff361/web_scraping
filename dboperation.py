@@ -40,8 +40,8 @@ class DBOferta:
         try:
             mydb = connection.connect()
             cur = mydb.cursor()                                    
-            sql = "insert into Oferta (id_webscraping, titulo,empresa,lugar,salario,oferta_detalle,url_oferta,url_pagina,time_publicacion, area, id_anuncioempleo, fecha_creacion,fecha_modificacion) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,current_date,current_date)"            
-            params = (oferta["id_carga"], oferta["puesto"].strip(), oferta["empresa"].strip(), oferta["lugar"].strip(),oferta["salario"].strip(),oferta["detalle"].strip(), oferta["url"], oferta["url_pagina"], oferta["time_publicacion"], oferta["area"], oferta["id_anuncioempleo"])
+            sql = "insert into Oferta (id_webscraping, titulo,empresa,lugar,salario,oferta_detalle,url_oferta,url_pagina,time_publicacion, area, id_anuncioempleo,fecha_publicacion, fecha_creacion,fecha_modificacion) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,current_date,current_date)"            
+            params = (oferta["id_carga"], oferta["puesto"].strip(), oferta["empresa"].strip(), oferta["lugar"].strip(),oferta["salario"].strip(),oferta["detalle"].strip(), oferta["url"], oferta["url_pagina"], oferta["time_publicacion"], oferta["area"], oferta["id_anuncioempleo"], oferta["fecha_publicacion"])
             cur.execute(sql, params)        
             mydb.commit()            
 

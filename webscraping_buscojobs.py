@@ -8,6 +8,9 @@ from controller import Controller
 from configuration import BUSCOJOBS
 import unicodedata
 
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
 
 def contain_br(contents):
     for element in contents:
@@ -68,6 +71,10 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
 
                 oferta["time_publicacion"] = elimina_tildes(el.find("span", attrs={"class": "pull-right"}).get_text().strip())
                 #print(oferta["time_publicacion"])
+
+                fecha_p = oferta["time_publicacion"].split(" ")
+                oferta["fecha_publicacion"] = fecha_publicacion(fecha_p[-1], fecha_p[-2])
+                #print(oferta["fecha_publicacion"])
             
                 oferta["puesto"] = elimina_tildes(el.find("h3", {"class": ""}).get_text().strip()[0:200])
 
@@ -172,3 +179,17 @@ def obtener_lista_keywords(con):
 def elimina_tildes(cadena):
     s = ''.join((c for c in unicodedata.normalize('NFD',cadena) if unicodedata.category(c) != 'Mn'))
     return s.upper()
+
+def fecha_publicacion(modalidad, tiempo):
+    if(tiempo == "UN"):
+        tiempo = 1
+
+    tiempo = int(tiempo)
+    switcher = {
+        "HORAS": datetime.now() + timedelta(days=-tiempo/24),       
+        "DIA":   datetime.now() + timedelta(days=-1),
+        "DIAS":  datetime.now() + timedelta(days=-tiempo),
+        "MES":   datetime.now() + timedelta(days=-30),
+        "MESES": datetime.now() + timedelta(days=-tiempo*30)
+    }
+    return switcher.get(modalidad,datetime.now())
