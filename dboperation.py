@@ -10,8 +10,8 @@ class DBWebscraping:
           mydb = connection.connect()         
           cur = mydb.cursor() 
           # insertando un registro
-          sql = "insert into webscraping (busqueda, busqueda_area, pagina_web, url_pagina, url_busqueda,fecha_creacion,fecha_modificacion, id_keyword) values (%s,%s,%s,%s,%s,current_date,current_date,%s)"
-          params = (carga["busqueda"], carga["busqueda_area"], carga["pagina"], carga["url_principal"],carga["url_busqueda"], carga["id_keyword"])
+          sql = "insert into webscraping (busqueda, busqueda_area, pagina_web, url_pagina, url_busqueda,fecha_creacion,fecha_modificacion, id_keyword, delati_team) values (%s,%s,%s,%s,%s,current_date,current_date,%s,%s)"
+          params = (carga["busqueda"], carga["busqueda_area"], carga["pagina"], carga["url_principal"],carga["url_busqueda"], carga["id_keyword"], carga["delati_team"])
                     
           cur.execute(sql, params)                 
 
@@ -66,7 +66,7 @@ class DBOferta:
             mydb = connection.connect()
             cur = mydb.cursor()                                    
             row = None
-            sql = "SELECT * FROM OFERTA WHERE URL_OFERTA = '" + oferta["url"] + "' LIMIT 1;" 
+            sql = "SELECT * FROM OFERTA WHERE URL_OFERTA = '" + oferta["url"] + "' AND ID_ESTADO IS NULL LIMIT 1;" 
             #print(sql)
             cur.execute(sql)  
             row = cur.fetchone()

@@ -114,6 +114,7 @@ def delati_buscojobs():
     carga["pagina_inicial"] = BUSCOJOBS["WS_PAGINA_INICIAL"]
     carga["cant_ofertas"] = BUSCOJOBS["WS_OFERTAS"]
     carga["busqueda_area"] = BUSCOJOBS["WS_AREA"]
+    carga["delati_team"] = BUSCOJOBS["NAME_TEAM"]
     carga["busqueda"] = ""
     set_url_busqueda_buscojobs(carga)
 

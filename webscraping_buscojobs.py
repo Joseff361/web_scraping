@@ -46,7 +46,10 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
 
         req = requests.get(url_pagina)
         soup = BeautifulSoup(req.text, "lxml")
-        avisos=soup.findAll("div", attrs={"class":"row result click"})                            
+        try:
+            avisos=soup.findAll("div", attrs={"class":"row result click"})                            
+        except:
+            avisos=[]
 
         lista_oferta = []
         for el in avisos:
@@ -65,7 +68,7 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
             #print(oferta["url"].split("-")[-1])
 
             redundancia  = controller.evitar_redundancia(con, oferta)
-            #redundancia = None
+            redundancia = None
             if(redundancia is None):
                 print("Registro nuevo")
 
@@ -131,25 +134,28 @@ def scraping_ofertadetalle(url_pagina, row_id, con):
 
     str_list = list(filter(None, str_list))
 
-    print(str_list)
+    #print(str_list)
+    """
     try:
         contenido_extra = soup.findAll("div", attrs={"class": "row oferta-contenido"})
         str_list2 = elimina_tildes(contenido_extra[-1].get_text().replace("•", '')).splitlines()
         str_list2 = list(filter(None, str_list2))
     except:
         str_list2 = []
-    print(str_list2)
+    """
+    #print(str_list2)
 
 
 
     for s_contenido in str_list:
-        detalle["descripcion"] = s_contenido.strip()
+        detalle["descripcion"] = s_contenido.strip()[0:2000]
         controller.registrar_oferta_detalle(con, detalle)
     
+    """
     for s_contenido_x in str_list2:
         detalle["descripcion"] = s_contenido_x.strip()
         controller.registrar_oferta_detalle(con, detalle)
-    
+    """
     return 1
 
 
