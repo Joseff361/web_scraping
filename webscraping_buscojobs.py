@@ -130,8 +130,11 @@ def scraping_ofertadetalle(url_pagina, row_id, con):
     soup = BeautifulSoup(req.text, "lxml")
     
     contenido = soup.find("div", attrs={"class": "col-md-12 descripcion-texto"})
-    str_list = elimina_tildes(contenido.decode_contents().replace("</p>", '').replace("<p>", '').replace("-", '').replace("•", '').strip()).split('<BR/>')
-
+    try: 
+        str_list = elimina_tildes(contenido.decode_contents().replace("</p>", '').replace("<p>", '').replace("-", '').replace("•", '').strip()).split('<BR/>')
+    except: 
+        str_list = []
+        
     str_list = list(filter(None, str_list))
 
     #print(str_list)
