@@ -91,8 +91,11 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
                 soup_deta = BeautifulSoup(reqDeta.text, "lxml")
 
                 oferta_d=soup_deta.find("div", attrs={"class":"oferta-main-top"})                    
-                oferta["empresa"] = elimina_tildes(oferta_d.find("h2", attrs={"class":""}).get_text().strip())
-                
+                try:
+                    oferta["empresa"] = elimina_tildes(oferta_d.find("h2", attrs={"class":""}).get_text().strip())
+                except:
+                    oferta["empresa"] = "NO ESPECIFICADO"
+
                 oferta["salario"] = "NO ESPECIFICADO"
 
                 oferta["area"]=elimina_tildes(oferta_d.findAll("a", attrs={"class": ""})[-1].get_text().strip())
