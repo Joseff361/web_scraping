@@ -98,7 +98,12 @@ def scraping_ofertas(con, url_principal, prefix_url, sufix_url, pagina_inicial, 
 
                 oferta["salario"] = "NO ESPECIFICADO"
 
-                oferta["area"]=elimina_tildes(oferta_d.findAll("a", attrs={"class": ""})[-1].get_text().strip())
+
+                try: 
+                    oferta["area"]=elimina_tildes(oferta_d.findAll("a", attrs={"class": ""})[-1].get_text().strip())
+                except:
+                    oferta["area"] = "NO ESPECIFICADO"
+                
                 oferta["id_anuncioempleo"] = link.split('-')[-1]
 
                 try:
